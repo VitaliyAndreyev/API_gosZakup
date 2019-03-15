@@ -21,25 +21,66 @@ def getResponse(url):
         return json.loads(response.text);
 
 
-firstResult = getResponse("https://ows.goszakup.gov.kz/trd-buy/bin/130940015918");
-next_page = firstResult['next_page'];
+arrayObject = [];
 
-flag = True;
 
-array = [];
-array.append(next_page);
+class Customers(object):
+    name = ""
+    email = 0
+    phone = ""
+    type = 0
+    website = ""
+
+def make_customer(name, email="", phone="", type=0, website=""):
+    customer = {};
+    customer = {'name': name,
+           "email": email,
+           "phone": phone,
+           "type": type,
+           "website": website};
+
+
+    return customer
+
+def addObject(result):
+    for rec in result['items']:
+
+        name = ""
+        email = ""
+        phone = ""
+        type = ""
+        website = ""
+
+        if 'name_ru' in rec:
+            name = rec['name_ru'];
+
+        if 'email' in rec:
+            email = rec['email'];
+
+        if 'phone' in rec:
+            phone = rec['phone'];
+
+        if 'type_supplier' in rec:
+            type = rec['type_supplier'];
+
+        if 'website' in rec:
+            website = rec['website'];
+
+        arrayObject.append(make_customer(name, email, phone, type, website));
+
+
+result = getResponse("https://ows.goszakup.gov.kz/subject/all");
+addObject(result)
+
+next_page = result['next_page'];
 
 while True:
     result = getResponse("https://ows.goszakup.gov.kz" + next_page);
-    next_page = result['next_page'];
-
-    array.append(next_page);
 
     if not next_page:
         break;
 
-pprint(len(array));
-pprint(firstResult)
-
+    addObject(result)
+    pprint(len(arrayObject))
 
 
